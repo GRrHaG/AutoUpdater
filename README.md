@@ -7,7 +7,7 @@ For Update automatically Freqtrade and his Strategy as soon as the updates are a
 ###### update Pairlist
 ###### update Blacklist
 ###### update AutoUpdater	
-###### You can show the difference between your old Blacklist and the newest
+###### You can show the difference between your old Blacklist and the newest ( Work Only with NostalgiaForInfinity Blacklist )
 ###### Send message to telegram for each update 
 	
 
