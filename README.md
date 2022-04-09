@@ -1,0 +1,2 @@
+# AutoUpdater
+Freqtrade Strategy AutoUpdater
