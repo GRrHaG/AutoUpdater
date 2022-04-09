@@ -57,7 +57,7 @@ FREQTRADE_STRATEGY_PATH=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep
 FREQTRADE_PAIRLIST_PATH=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o 'FREQTRADE_PAIRLIST_PATH=.*' | sed "s/FREQTRADE_PAIRLIST_PATH=//g"| sed 's/ //')
 FREQTRADE_BLACKLIST_PATH=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o 'FREQTRADE_BLACKLIST_PATH=.*' | sed "s/FREQTRADE_BLACKLIST_PATH=//g"| sed 's/ //')
 URL_GIT_FREQTRADE=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o 'URL_GIT_FREQTRADE=.*' | sed "s/URL_GIT_FREQTRADE=//g"| sed 's/ //')
-URL_GIT_NFI=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o 'URL_GIT_NFI=.*' | sed "s/URL_GIT_NFI=//g"| sed 's/ //')
+URL_GIT_STRATEGY=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o 'URL_GIT_STRATEGY=.*' | sed "s/URL_GIT_STRATEGY=//g"| sed 's/ //')
 telegram_token=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o 'telegram_token=.*' | sed "s/telegram_token=//g"| sed 's/ //')
 telegram_chat_id=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o 'telegram_chat_id=.*' | sed "s/telegram_chat_id=//g"| sed 's/ //')
 DOWNLOAD_STRATEGY_PATH=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o 'DOWNLOAD_STRATEGY_PATH=.*' | sed "s/DOWNLOAD_STRATEGY_PATH=//g"| sed 's/ //')
@@ -67,8 +67,8 @@ DOWNLOAD_AUTOUPDATER_PATH=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | gr
 url_git_autoupdater=https://api.github.com/repos/GRrHaG/AutoUpdater/releases/latest
 latest_version_autoupdater=$(curl -s ${url_git_autoupdater} | grep -o '"tag_name": ".*"' | sed 's/"tag_name": "//' | sed 's/"//')
 latest_version_freqtrade=$(curl -s ${URL_GIT_FREQTRADE} | grep -o '"tag_name": ".*"' | sed 's/"tag_name": "//' | sed 's/"//')
-strategy_version=$(curl -s ${URL_GIT_NFI} | grep -o '"tag_name": ".*"' | sed 's/"tag_name": "//' | sed 's/"//')
-git_tarball_url=$(curl -s ${URL_GIT_NFI} | grep -o '"tarball_url": ".*"' | sed 's/"tarball_url": "//' | sed 's/"//')
+strategy_version=$(curl -s ${URL_GIT_STRATEGY} | grep -o '"tag_name": ".*"' | sed 's/"tag_name": "//' | sed 's/"//')
+git_tarball_url=$(curl -s ${URL_GIT_STRATEGY} | grep -o '"tarball_url": ".*"' | sed 's/"tarball_url": "//' | sed 's/"//')
 git_tarball_autoupdater_url=$(curl -s ${url_git_autoupdater} | grep -o '"tarball_url": ".*"' | sed 's/"tarball_url": "//' | sed 's/"//')
 LATEST_STRATEGY_PATH=${DOWNLOAD_STRATEGY_PATH}"/NostalgiaForInfinity-"${strategy_version}
 LATEST_AUTOUPDATER_PATH=${DOWNLOAD_AUTOUPDATER_PATH}"/AutoUpdater-"${latest_version_autoupdater}
@@ -119,7 +119,7 @@ echo "$SEND_TIMESTAMP Freqtrade Strategy Path : $FREQTRADE_STRATEGY_PATH"
 echo "$SEND_TIMESTAMP Freqtrade Pairlist Path : $FREQTRADE_PAIRLIST_PATH"
 echo "$SEND_TIMESTAMP Freqtrade Blacklist Path : $FREQTRADE_BLACKLIST_PATH"
 echo "$SEND_TIMESTAMP URL GIT Freqtrade : $URL_GIT_FREQTRADE"
-echo "$SEND_TIMESTAMP URL GIT Strategy : $URL_GIT_NFI"
+echo "$SEND_TIMESTAMP URL GIT Strategy : $URL_GIT_STRATEGY"
 
 echo "$SEND_TIMESTAMP Latest Version of Freqtrade on Github : $latest_version_freqtrade"
 echo "$SEND_TIMESTAMP Latest Version of Freqtrade on history_log : $version_freqtrade_log"
