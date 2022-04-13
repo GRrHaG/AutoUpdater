@@ -32,7 +32,7 @@
 
 #!/bin/bash
 
-GRRHAG_AUTOUPDATER_VERSION="1.03"
+GRRHAG_AUTOUPDATER_VERSION="1.04"
 TIMESTAMP_YMD=$(date +"%Y-%m-%d")
 TIMESTAMP_HM=$(date +"%H:%M")
 TIMESTAMP_H=$(date +"%H")
@@ -42,26 +42,26 @@ AUTOUPDATER_PATH=$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 
 CONFIG=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json)
 
-ALLOW_UPDATE_AUTOUPDATER=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o 'ALLOW_UPDATE_AUTOUPDATER=.*' | sed "s/ALLOW_UPDATE_AUTOUPDATER=//g"| sed 's/ //')
-ALLOW_UPDATE_FREQTRADE=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o 'ALLOW_UPDATE_FREQTRADE=.*' | sed "s/ALLOW_UPDATE_FREQTRADE=//g"| sed 's/ //')
-ALLOW_UPDATE_STRATEGY=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o 'ALLOW_UPDATE_STRATEGY=.*' | sed "s/ALLOW_UPDATE_STRATEGY=//g"| sed 's/ //')
-ALLOW_UPDATE_BLACKLIST=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o 'ALLOW_UPDATE_BLACKLIST=.*' | sed "s/ALLOW_UPDATE_BLACKLIST=//g"| sed 's/ //')
-ALLOW_BLACKLIST_DETAIL=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o 'ALLOW_BLACKLIST_DETAIL=.*' | sed "s/ALLOW_BLACKLIST_DETAIL=//g"| sed 's/ //')
-ALLOW_UPDATE_PAIRLIST=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o 'ALLOW_UPDATE_PAIRLIST=.*' | sed "s/ALLOW_UPDATE_PAIRLIST=//g"| sed 's/ //')
-ALLOW_REBOOT=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o 'ALLOW_REBOOT=.*' | sed "s/ALLOW_REBOOT=//g"| sed 's/ //')
-BOT_STRATEGY_NAME=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o 'BOT_STRATEGY_NAME=.*' | sed "s/BOT_STRATEGY_NAME=//g"| sed 's/ //')
-BOT_PAIRLIST_NAME=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o 'BOT_PAIRLIST_NAME=.*' | sed "s/BOT_PAIRLIST_NAME=//g"| sed 's/ //')
-BOT_BLACKLIST_NAME=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o 'BOT_BLACKLIST_NAME=.*' | sed "s/BOT_BLACKLIST_NAME=//g"| sed 's/ //')
-FREQTRADE_HOME_PATH=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o 'FREQTRADE_HOME_PATH=.*' | sed "s/FREQTRADE_HOME_PATH=//g"| sed 's/ //')
-FREQTRADE_STRATEGY_PATH=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o 'FREQTRADE_STRATEGY_PATH=.*' | sed "s/FREQTRADE_STRATEGY_PATH=//g"| sed 's/ //')
-FREQTRADE_PAIRLIST_PATH=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o 'FREQTRADE_PAIRLIST_PATH=.*' | sed "s/FREQTRADE_PAIRLIST_PATH=//g"| sed 's/ //')
-FREQTRADE_BLACKLIST_PATH=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o 'FREQTRADE_BLACKLIST_PATH=.*' | sed "s/FREQTRADE_BLACKLIST_PATH=//g"| sed 's/ //')
-URL_GIT_FREQTRADE=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o 'URL_GIT_FREQTRADE=.*' | sed "s/URL_GIT_FREQTRADE=//g"| sed 's/ //')
-URL_GIT_STRATEGY=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o 'URL_GIT_STRATEGY=.*' | sed "s/URL_GIT_STRATEGY=//g"| sed 's/ //')
-telegram_token=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o 'telegram_token=.*' | sed "s/telegram_token=//g"| sed 's/ //')
-telegram_chat_id=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o 'telegram_chat_id=.*' | sed "s/telegram_chat_id=//g"| sed 's/ //')
-DOWNLOAD_STRATEGY_PATH=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o 'DOWNLOAD_STRATEGY_PATH=.*' | sed "s/DOWNLOAD_STRATEGY_PATH=//g"| sed 's/ //')
-DOWNLOAD_AUTOUPDATER_PATH=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o 'DOWNLOAD_AUTOUPDATER_PATH=.*' | sed "s/DOWNLOAD_AUTOUPDATER_PATH=//g"| sed 's/ //')
+ALLOW_UPDATE_AUTOUPDATER=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o '\"ALLOW_UPDATE_AUTOUPDATER\": \".*' | sed "s/\"ALLOW_UPDATE_AUTOUPDATER\": \"//g"| sed 's/\",//')
+ALLOW_UPDATE_FREQTRADE=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o '\"ALLOW_UPDATE_FREQTRADE\": \".*' | sed "s/\"ALLOW_UPDATE_FREQTRADE\": \"//g"| sed 's/\",//')
+ALLOW_UPDATE_STRATEGY=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o '\"ALLOW_UPDATE_STRATEGY\": \".*' | sed "s/\"ALLOW_UPDATE_STRATEGY\": \"//g"| sed 's/\",//')
+ALLOW_UPDATE_BLACKLIST=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o '\"ALLOW_UPDATE_BLACKLIST\": \".*' | sed "s/\"ALLOW_UPDATE_BLACKLIST\": \"//g"| sed 's/\",//')
+ALLOW_BLACKLIST_DETAIL=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o '\"ALLOW_BLACKLIST_DETAIL\": \".*' | sed "s/\"ALLOW_BLACKLIST_DETAIL\": \"//g"| sed 's/\",//')
+ALLOW_UPDATE_PAIRLIST=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o '\"ALLOW_UPDATE_PAIRLIST\": \".*' | sed "s/\"ALLOW_UPDATE_PAIRLIST\": \"//g"| sed 's/\",//')
+ALLOW_REBOOT=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o '\"ALLOW_REBOOT\": \".*' | sed "s/\"ALLOW_REBOOT\": \"//g"| sed 's/\",//')
+BOT_STRATEGY_NAME=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o '\"BOT_STRATEGY_NAME\": \".*' | sed "s/\"BOT_STRATEGY_NAME\": \"//g"| sed 's/\",//')
+BOT_PAIRLIST_NAME=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o '\"BOT_PAIRLIST_NAME\": \".*' | sed "s/\"BOT_PAIRLIST_NAME\": \"//g"| sed 's/\",//')
+BOT_BLACKLIST_NAME=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o '\"BOT_BLACKLIST_NAME\": \".*' | sed "s/\"BOT_BLACKLIST_NAME\": \"//g"| sed 's/\",//')
+FREQTRADE_HOME_PATH=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o '\"FREQTRADE_HOME_PATH\": \".*' | sed "s/\"FREQTRADE_HOME_PATH\": \"//g"| sed 's/\",//')
+FREQTRADE_STRATEGY_PATH=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o '\"FREQTRADE_STRATEGY_PATH\": \".*' | sed "s/\"FREQTRADE_STRATEGY_PATH\": \"//g"| sed 's/\",//')
+FREQTRADE_PAIRLIST_PATH=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o '\"FREQTRADE_PAIRLIST_PATH\": \".*' | sed "s/\"FREQTRADE_PAIRLIST_PATH\": \"//g"| sed 's/\",//')
+FREQTRADE_BLACKLIST_PATH=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o '\"FREQTRADE_BLACKLIST_PATH\": \".*' | sed "s/\"FREQTRADE_BLACKLIST_PATH\": \"//g"| sed 's/\",//')
+URL_GIT_FREQTRADE=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o '\"URL_GIT_FREQTRADE\": \".*' | sed "s/\"URL_GIT_FREQTRADE\": \"//g"| sed 's/\",//')
+URL_GIT_STRATEGY=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o '\"URL_GIT_STRATEGY\": \".*' | sed "s/\"URL_GIT_STRATEGY\": \"//g"| sed 's/\",//')
+telegram_token=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o '\"token\": \".*' | sed "s/\"token\": \"//g"| sed 's/\",//')
+telegram_chat_id=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o '\"chat_id\": \".*' | sed "s/\"chat_id\": \"//g"| sed 's/\",//')
+DOWNLOAD_STRATEGY_PATH=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o '\"DOWNLOAD_STRATEGY_PATH\": \".*' | sed "s/\"DOWNLOAD_STRATEGY_PATH\": \"//g"| sed 's/\",//')
+DOWNLOAD_AUTOUPDATER_PATH=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o '\"DOWNLOAD_AUTOUPDATER_PATH\": \".*' | sed "s/\"DOWNLOAD_AUTOUPDATER_PATH\": \"//g"| sed 's/\",//')
 
 
 url_git_autoupdater=https://api.github.com/repos/GRrHaG/AutoUpdater/releases/latest
@@ -323,7 +323,7 @@ echo "$SEND_TIMESTAMP Create New Folder for Download Latest Strategy $strategy_v
           fi
   
           if [ -z $SEND_a_ET ] && [ -z $SEND_l_ET ] && [ -z $SEND_a_LT ] && [ -z $SEND_l_LT ] && [ -z $SEND_a_ST ] && [ -z $SEND_l_ST ] && [ -z $SEND_a_FT ] && [ -z $SEND_l_FT ] && [ -z $SEND_a_OC ] && [ -z $SEND_l_OC ]; then
-            SEND_T_B_Y_D=$BlacklistDetail" No Update"
+            SEND_T_B_Y_D=$BlacklistDetail" No change"
           else
             SEND_T_B_Y_D=$BlacklistDetail$SEND_ET$SEND_LT$SEND_ST$SEND_FT$SEND_OC
           fi
