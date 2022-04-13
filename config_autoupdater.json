@@ -1,34 +1,37 @@
-# Settings
+{
+	"autoupdater": {
 
-########## Y for allow ##########
-ALLOW_UPDATE_AUTOUPDATER=Y
-ALLOW_UPDATE_FREQTRADE=Y
-ALLOW_UPDATE_STRATEGY=Y
-ALLOW_UPDATE_BLACKLIST=Y
-ALLOW_BLACKLIST_DETAIL=Y
-ALLOW_UPDATE_PAIRLIST=Y
-ALLOW_REBOOT=Y
-#################################
-
-############################### REPLACE THIS WITH YOUR OWN INFORMATION ##########################################
-
-###### FILE NAME ######
-BOT_STRATEGY_NAME=NostalgiaForInfinityX.py
-BOT_PAIRLIST_NAME=pairlist-volume-kucoin-usdt.json
-BOT_BLACKLIST_NAME=blacklist-kucoin.json
-
-###### PATH ######
-FREQTRADE_HOME_PATH=/home/pi/ft_userdata
-FREQTRADE_STRATEGY_PATH=/home/pi/ft_userdata/user_data/strategies
-FREQTRADE_PAIRLIST_PATH=/home/pi/ft_userdata/user_data/my_data/Pairlist
-FREQTRADE_BLACKLIST_PATH=/home/pi/ft_userdata/user_data/my_data/Pairlist
-DOWNLOAD_STRATEGY_PATH=/home/pi/Repo/NostalgiaForInfinity
-DOWNLOAD_AUTOUPDATER_PATH=/home/pi/Repo/AutoUpdater
-
-###### GIT URL ######
-URL_GIT_FREQTRADE=https://api.github.com/repos/freqtrade/freqtrade/releases/latest
-URL_GIT_STRATEGY=https://api.github.com/repos/iterativv/NostalgiaForInfinity/releases/latest
-
-###### TELEGRAM ######
-telegram_token=123456789:123456789
-telegram_chat_id=123456789
+		// Y for allow 
+		"ALLOW_UPDATE_AUTOUPDATER": "Y",
+		"ALLOW_UPDATE_FREQTRADE": "Y",
+		"ALLOW_UPDATE_STRATEGY": "Y",
+		"ALLOW_UPDATE_BLACKLIST": "Y",
+		"ALLOW_BLACKLIST_DETAIL": "Y",
+		"ALLOW_UPDATE_PAIRLIST": "Y",
+		"ALLOW_REBOOT": "Y",
+		
+		
+		// REPLACE THIS WITH YOUR OWN INFORMATION 
+		
+		// FILE NAME ######
+		"BOT_STRATEGY_NAME": "NostalgiaForInfinityX.py",
+		"BOT_PAIRLIST_NAME": "pairlist-volume-kucoin-usdt.json",
+		"BOT_BLACKLIST_NAME": "blacklist-kucoin.json",
+		
+		// PATH ######
+		"FREQTRADE_HOME_PATH": "/home/pi/ft_userdata",
+		"FREQTRADE_STRATEGY_PATH": "/home/pi/ft_userdata/user_data/strategies",
+		"FREQTRADE_PAIRLIST_PATH": "/home/pi/ft_userdata/user_data/my_data/Pairlist",
+		"FREQTRADE_BLACKLIST_PATH": "/home/pi/ft_userdata/user_data/my_data/Pairlist",
+		"DOWNLOAD_STRATEGY_PATH": "/home/pi/Repo/NostalgiaForInfinity",
+		"DOWNLOAD_AUTOUPDATER_PATH": "/home/pi/Repo/AutoUpdater",
+		
+		// GIT URL ######
+		"URL_GIT_FREQTRADE": "https://api.github.com/repos/freqtrade/freqtrade/releases/latest",
+		"URL_GIT_STRATEGY": "https://api.github.com/repos/iterativv/NostalgiaForInfinity/releases/latest",
+		
+		// TELEGRAM ######
+		"token": "123456789:123456789",
+		"chat_id": "123456789",
+	}
+}
