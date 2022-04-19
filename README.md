@@ -19,7 +19,9 @@ Clone The Repository to /ft_userdata/tools/
        typing "crontab -e" in terminal                                                                      
        write on the bottom of the file: */5 * * * * bash -lc [YOUR AUTOUPDATER PATH]/GRrHaG_AutoUpdater.sh  
              example : */5 * * * * bash -lc /home/pi/ft_userdata/tools/GRrHaG_AutoUpdater.sh               
-       use ctrl+o for save crontab and ctrl+x for quit crontab                                              
+       use ctrl+o for save crontab , press ENTER for validated and ctrl+x for quit crontab 
+       
+# Change the access permissions of Autoupdater  :   
        cd [YOUR AUTOUPDATER PATH]                                                                           
        chmod +x GRrHaG_AutoUpdater.sh 
        
@@ -27,6 +29,22 @@ Clone The Repository to /ft_userdata/tools/
 
 ###### Place config_autoupdater.json in /ft_userdata/tools/
 ###### You can activate the updates by entering Y or deactivate them by leaving empty
+
+###### Update Freqtrade
+
+	If you wan't to update Freeqtarde you must have a service name "freqtrade" in docker-compose.yml
+	If you don't have it add : 
+	
+	  freqtrade:
+  		  image: freqtradeorg/freqtrade:stable   
+   		  restart: unless-stopped
+  	          container_name: freqtrade
+ 		  volumes:
+ 		     - "./user_data:/freqtrade/user_data"
+		  command: >
+  		    trade
+		    --logfile /freqtrade/user_data/logs/freqtrade.log
+
 
 ## I recommend not to activate the update of the autoupdater but to come and check the updates by yourself and to see what changes in the code
 
