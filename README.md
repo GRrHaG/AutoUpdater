@@ -30,7 +30,7 @@ Clone The Repository to /ft_userdata/tools/
 ###### Place config_autoupdater.json in /ft_userdata/tools/
 ###### You can activate the updates by entering Y or deactivate them by leaving empty
 
-###### Update Freqtrade
+###### Update Freqtrade : 
 
 	If you wan't to update Freeqtarde you must have a service name "freqtrade" in docker-compose.yml
 	If you don't have it add : 
