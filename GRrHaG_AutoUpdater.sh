@@ -32,7 +32,7 @@
 
 #!/bin/bash
 
-GRRHAG_AUTOUPDATER_VERSION="1.04"
+GRRHAG_AUTOUPDATER_VERSION="1.05"
 TIMESTAMP_YMD=$(date +"%Y-%m-%d")
 TIMESTAMP_HM=$(date +"%H:%M")
 TIMESTAMP_H=$(date +"%H")
@@ -210,10 +210,9 @@ echo "$SEND_TIMESTAMP Create New Folder for Download Latest Strategy $strategy_v
   SEND_T_P=$SEND_T_P_Y$SEND_T_P_N
   
   if [ "$ALLOW_UPDATE_BLACKLIST" == "Y" ] ; then
-  cp ${LATEST_STRATEGY_PATH}/configs/${BOT_BLACKLIST_NAME} ${FREQTRADE_BLACKLIST_PATH}/${BOT_BLACKLIST_NAME}
-  SEND_T_B_Y="<b>   Blacklist : </b><pre>Updated</pre>"
-  echo "$SEND_TIMESTAMP Blacklist : Updated"
+
       if [ "$ALLOW_BLACKLIST_DETAIL" == "Y" ] ; then
+      
       echo "$SEND_TIMESTAMP Blacklist Detail: Allow"
       cp ${LATEST_STRATEGY_PATH}/configs/${BOT_BLACKLIST_NAME} ${AUTOUPDATER_PATH}/temp/blacklist/latest_${BOT_BLACKLIST_NAME}
       cp ${FREQTRADE_BLACKLIST_PATH}/${BOT_BLACKLIST_NAME} ${AUTOUPDATER_PATH}/temp/blacklist/actual_${BOT_BLACKLIST_NAME}
@@ -337,6 +336,10 @@ echo "$SEND_TIMESTAMP Create New Folder for Download Latest Strategy $strategy_v
       rm -rf latest_*
       rm -f se*
       fi
+  
+  cp ${LATEST_STRATEGY_PATH}/configs/${BOT_BLACKLIST_NAME} ${FREQTRADE_BLACKLIST_PATH}/${BOT_BLACKLIST_NAME}
+  SEND_T_B_Y="<b>   Blacklist : </b><pre>Updated</pre>"
+  echo "$SEND_TIMESTAMP Blacklist : Updated"
   
   else
     SEND_T_B_N="<b>   Blacklist : </b><pre>Update Disabled</pre>."
