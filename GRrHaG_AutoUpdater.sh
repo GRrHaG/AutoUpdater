@@ -32,7 +32,7 @@
 
 #!/bin/bash
 
-GRRHAG_AUTOUPDATER_VERSION="1.05"
+GRRHAG_AUTOUPDATER_VERSION="1.06"
 TIMESTAMP_YMD=$(date +"%Y-%m-%d")
 TIMESTAMP_HM=$(date +"%H:%M")
 TIMESTAMP_H=$(date +"%H")
@@ -93,13 +93,13 @@ echo "$SEND_TIMESTAMP History Log File found"
 Log_ID=$(cat ${AUTOUPDATER_PATH}/history_autoupdater.txt | grep -o 'ID=.* ;' | sed ':a;$q;N;1,$D;ba' | sed "s/ID=//g"| sed 's/ //' | sed 's/;//') 
 strategy_version_log=$(cat ${AUTOUPDATER_PATH}/history_autoupdater.txt | grep -o 'Strategy_Update=.*' | sed "s/Strategy_Update=//g"| sed 's/ //' | sed ':a;$q;N;1,$D;ba') 
 version_freqtrade_log=$(cat ${AUTOUPDATER_PATH}/history_autoupdater.txt | grep -o 'Freqtrade_Update=.*' | sed "s/Freqtrade_Update=//g"| sed 's/ //' | sed ':a;$q;N;1,$D;ba') 
+nb_update_today_log=$(cat ${AUTOUPDATER_PATH}/history_autoupdater.txt | grep -c $TIMESTAMP_YMD) 
 else
 echo "$SEND_TIMESTAMP History Log File don't exist"
 Log_ID=0
 strategy_version_log="empty"
 version_freqtrade_log="empty"
 fi
-
 
 echo "$SEND_TIMESTAMP STARTING SCRIPT"
 echo "$SEND_TIMESTAMP AutoUpdater Version : $GRRHAG_AUTOUPDATER_VERSION"
@@ -402,15 +402,12 @@ else
 echo "$SEND_TIMESTAMP Latest Strategy $strategy_version already install"
 
   if [ "$TIMESTAMP_H" == "23" ]; then
-  
+
     if [ "$TIMESTAMP_M" == "54" -o "$TIMESTAMP_M" == "55" -o "$TIMESTAMP_M" == "56" -o "$TIMESTAMP_M" == "57" -o "$TIMESTAMP_M" == "58" -o "$TIMESTAMP_M" == "59" ]; then
     echo "$SEND_TIMESTAMP Send daily message"
-      if [ -d ${AUTOUPDATER_PATH}/temp/update ]; then
-    
-        cd ${AUTOUPDATER_PATH}/temp/update
-        find ./ -type f | wc -l > nb
-        SEND_nb=$(cat nb)
-        rm -rf ${AUTOUPDATER_PATH}/temp/update
+      if [ "$nb_update_today_log" != "0" ]; then
+            
+        SEND_nb=$nb_update_today_log        
       
         # Send message to telegram
         curl \
@@ -421,7 +418,8 @@ echo "$SEND_TIMESTAMP Latest Strategy $strategy_version already install"
             --data "parse_mode=HTML" \
             https://api.telegram.org/bot${telegram_token}/sendMessage
         echo "$SEND_TIMESTAMP Daily Message : $SEND_nb Update Today"
-      else      
+      else  
+    
         # If folder exist send Telegram message
         curl \
           -s \
