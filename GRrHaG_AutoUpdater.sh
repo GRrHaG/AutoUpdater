@@ -32,7 +32,7 @@
 
 #!/bin/bash
 
-GRRHAG_AUTOUPDATER_VERSION="1.06"
+GRRHAG_AUTOUPDATER_VERSION="1.07"
 TIMESTAMP_YMD=$(date +"%Y-%m-%d")
 TIMESTAMP_HM=$(date +"%H:%M")
 TIMESTAMP_H=$(date +"%H")
@@ -104,7 +104,7 @@ fi
 echo "$SEND_TIMESTAMP STARTING SCRIPT"
 echo "$SEND_TIMESTAMP AutoUpdater Version : $GRRHAG_AUTOUPDATER_VERSION"
 echo "$SEND_TIMESTAMP CONFIGURATION :"
-echo "$SEND_TIMESTAMP Allow Update Freqtrade : $ALLOW_UPDATE_AUTOUPDATER"
+echo "$SEND_TIMESTAMP Allow Update AutoUpdater : $ALLOW_UPDATE_AUTOUPDATER"
 echo "$SEND_TIMESTAMP Allow Update Freqtrade : $ALLOW_UPDATE_FREQTRADE"
 echo "$SEND_TIMESTAMP Allow Update Strategy : $ALLOW_UPDATE_STRATEGY"
 echo "$SEND_TIMESTAMP Allow Update Blacklist : $ALLOW_UPDATE_BLACKLIST"
@@ -162,7 +162,6 @@ fi
 
 #####
   mkdir -p ${AUTOUPDATER_PATH}/temp
-  mkdir -p ${AUTOUPDATER_PATH}/temp/update
   mkdir -p ${AUTOUPDATER_PATH}/temp/blacklist
 #####
 
@@ -382,7 +381,7 @@ echo "$SEND_TIMESTAMP Create New Folder for Download Latest Strategy $strategy_v
     # Restart bot
     cd $FREQTRADE_HOME_PATH/
     docker-compose stop
-#    docker-compose build
+    docker-compose build
     echo "$SEND_TIMESTAMP FREQTARDE : START"  
     docker-compose up -d
 
@@ -436,7 +435,16 @@ echo "$SEND_TIMESTAMP Latest Strategy $strategy_version already install"
 fi
 
 else
-echo "$SEND_TIMESTAMP GIT : API rate limit exceeded"  
+echo "$SEND_TIMESTAMP ERROR : Strategy Latest Version is empty"  
+    # Send message to telegram
+    curl \
+        -s \
+        -X POST \
+        --data "chat_id=$telegram_chat_id" \
+        --data "text=Error : Strategy Latest Version is empty" \
+        --data "parse_mode=HTML" \
+        https://api.telegram.org/bot${telegram_token}/sendMessage
+        echo "SEND_TIMESTAMP Error : Strategy Latest Version is empty"
 fi
 
 if [ "$ALLOW_UPDATE_FREQTRADE" == "Y" ] ; then
@@ -481,13 +489,11 @@ echo "$SEND_TIMESTAMP Update FREQTRADE : allow"
 				--data "text=$SEND_TO_TELEGRAM_3" \
 				--data "parse_mode=HTML" \
 				https://api.telegram.org/bot${telegram_token}/sendMessage
-				
-			echo "$SEND_TIMESTAMP FREQTARDE : STOP"  
+				  
 			cd $FREQTRADE_HOME_PATH/
-			docker-compose stop
-			echo "$SEND_TIMESTAMP FREQTARDE : PULL"  
+			docker-compose stop  
 			docker-compose pull
-			echo "$SEND_TIMESTAMP FREQTARDE : UP"  
+      docker-compose build 
 			docker-compose up -d
 			
 				# Send message to telegram
@@ -504,8 +510,13 @@ echo "$SEND_TIMESTAMP Update FREQTRADE : allow"
 			version_freqtrade=$(sed ':a;N;$!ba;s/\r//g' <<< $version_freqtrade)
 			version_freqtrade=$(sed ':a;N;$!ba;s/\n//g' <<< $version_freqtrade)
       
+      if [ ${version_freqtrade} != ${latest_version_freqtrade} ] ; then				
           Log_ID=$(($Log_ID + 1))    
     echo "$SEND_TIMESTAMP ; ID=$Log_ID ; Freqtrade_Update=$version_freqtrade" >> ${AUTOUPDATER_PATH}/history_autoupdater.txt
+    else
+          Log_ID=$(($Log_ID + 1))
+    echo "$SEND_TIMESTAMP ; ID=$Log_ID ; ERROR=Fail to Update Freqtrade v$version_freqtrade to v$latest_version_freqtrade" >> ${AUTOUPDATER_PATH}/history_autoupdater.txt
+    fi
       
 			cd $AUTOUPDATER_PATH
 			version_freqtrade_log=$(cat ${AUTOUPDATER_PATH}/history_autoupdater.txt | grep -o 'Freqtrade_Update=.*' | sed "s/Freqtrade_Update=//g"| sed 's/ //' | sed ':a;$q;N;1,$D;ba')
@@ -541,10 +552,10 @@ else
         -s \
         -X POST \
         --data "chat_id=$telegram_chat_id" \
-        --data "text=Status : Pas de retour GIT" \
+        --data "text=Error : Freqtrade Latest Version is empty" \
         --data "parse_mode=HTML" \
         https://api.telegram.org/bot${telegram_token}/sendMessage
-        echo "SEND_TIMESTAMP FREQTARDE : GIT Version is empty"  
+        echo "SEND_TIMESTAMP ERROR : Freqtrade Latest Version is empty"  
 fi
 
 echo "$SEND_TIMESTAMP AUTOUPDATER : No Update"  
