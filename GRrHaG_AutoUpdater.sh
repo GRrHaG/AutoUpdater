@@ -32,7 +32,7 @@
 
 #!/bin/bash
 
-GRRHAG_AUTOUPDATER_VERSION="1.07"
+GRRHAG_AUTOUPDATER_VERSION="1.08"
 TIMESTAMP_YMD=$(date +"%Y-%m-%d")
 TIMESTAMP_HM=$(date +"%H:%M")
 TIMESTAMP_H=$(date +"%H")
@@ -381,7 +381,7 @@ echo "$SEND_TIMESTAMP Create New Folder for Download Latest Strategy $strategy_v
     # Restart bot
     cd $FREQTRADE_HOME_PATH/
     docker-compose stop
-    docker-compose build
+    #docker-compose build
     echo "$SEND_TIMESTAMP FREQTARDE : START"  
     docker-compose up -d
 
@@ -493,7 +493,7 @@ echo "$SEND_TIMESTAMP Update FREQTRADE : allow"
 			cd $FREQTRADE_HOME_PATH/
 			docker-compose stop  
 			docker-compose pull
-      docker-compose build 
+      #docker-compose build 
 			docker-compose up -d
 			
 				# Send message to telegram
@@ -510,7 +510,7 @@ echo "$SEND_TIMESTAMP Update FREQTRADE : allow"
 			version_freqtrade=$(sed ':a;N;$!ba;s/\r//g' <<< $version_freqtrade)
 			version_freqtrade=$(sed ':a;N;$!ba;s/\n//g' <<< $version_freqtrade)
       
-      if [ ${version_freqtrade} != ${latest_version_freqtrade} ] ; then				
+      if [ ${version_freqtrade} = ${latest_version_freqtrade} ] ; then				
           Log_ID=$(($Log_ID + 1))    
     echo "$SEND_TIMESTAMP ; ID=$Log_ID ; Freqtrade_Update=$version_freqtrade" >> ${AUTOUPDATER_PATH}/history_autoupdater.txt
     else
