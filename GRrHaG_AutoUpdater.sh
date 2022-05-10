@@ -32,7 +32,7 @@
 
 #!/bin/bash
 
-GRRHAG_AUTOUPDATER_VERSION="1.08"
+GRRHAG_AUTOUPDATER_VERSION="1.09"
 TIMESTAMP_YMD=$(date +"%Y-%m-%d")
 TIMESTAMP_HM=$(date +"%H:%M")
 TIMESTAMP_H=$(date +"%H")
@@ -62,7 +62,15 @@ telegram_token=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o '\"to
 telegram_chat_id=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o '\"chat_id\": \".*' | sed "s/\"chat_id\": \"//g"| sed 's/\",//')
 DOWNLOAD_STRATEGY_PATH=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o '\"DOWNLOAD_STRATEGY_PATH\": \".*' | sed "s/\"DOWNLOAD_STRATEGY_PATH\": \"//g"| sed 's/\",//')
 DOWNLOAD_AUTOUPDATER_PATH=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o '\"DOWNLOAD_AUTOUPDATER_PATH\": \".*' | sed "s/\"DOWNLOAD_AUTOUPDATER_PATH\": \"//g"| sed 's/\",//')
+INSTALLER=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o '\"INSTALLER\": \".*' | sed "s/\"INSTALLER\": \"//g"| sed 's/\",//')
+CUSTOM_CMD_VERSION=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o '\"CUSTOM_CMD_VERSION\": \".*' | sed "s/\"CUSTOM_CMD_VERSION\": \"//g"| sed 's/\",//')
+CUSTOM_CMD_ACTIVATE_VE=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o '\"CUSTOM_CMD_ACTIVATE_VE\": \".*' | sed "s/\"CUSTOM_CMD_ACTIVATE_VE\": \"//g"| sed 's/\",//')
+CUSTOM_CMD_CLOSE_VE=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o '\"CUSTOM_CMD_CLOSE_VE\": \".*' | sed "s/\"CUSTOM_CMD_CLOSE_VE\": \"//g"| sed 's/\",//')
 
+CUSTOM_CMD_START=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o '\"CUSTOM_CMD_START\": \".*' | sed "s/\"CUSTOM_CMD_START\": \"//g"| sed 's/\",//')
+CUSTOM_CMD_STOP=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o '\"CUSTOM_CMD_STOP\": \".*' | sed "s/\"CUSTOM_CMD_STOP\": \"//g"| sed 's/\",//')
+CUSTOM_CMD_PULL=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o '\"CUSTOM_CMD_PULL\": \".*' | sed "s/\"CUSTOM_CMD_PULL\": \"//g"| sed 's/\",//')
+CUSTOM_CMD_BUILD=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o '\"CUSTOM_CMD_BUILD\": \".*' | sed "s/\"CUSTOM_CMD_BUILD\": \"//g"| sed 's/\",//')
 
 url_git_autoupdater=https://api.github.com/repos/GRrHaG/AutoUpdater/releases/latest
 latest_version_autoupdater=$(curl -s ${url_git_autoupdater} | grep -o '"tag_name": ".*"' | sed 's/"tag_name": "//' | sed 's/"//')
@@ -101,8 +109,19 @@ strategy_version_log="empty"
 version_freqtrade_log="empty"
 fi
 
+if [ -e ${AUTOUPDATER_PATH}/history_autoupdater_error.txt ]; then
+echo "$SEND_TIMESTAMP History ERROR Log File found"
+Log_error_ID=$(cat ${AUTOUPDATER_PATH}/history_autoupdater_error.txt | grep -o 'ID=.* ;' | sed ':a;$q;N;1,$D;ba' | sed "s/ID=//g"| sed 's/ //' | sed 's/;//') 
+nb_error_log=$(cat ${AUTOUPDATER_PATH}/history_autoupdater_error.txt | grep -c $TIMESTAMP_YMD) 
+else
+echo "$SEND_TIMESTAMP History Log File don't exist"
+Log_error_ID=0
+nb_error_log="0"
+fi
+
 echo "$SEND_TIMESTAMP STARTING SCRIPT"
 echo "$SEND_TIMESTAMP AutoUpdater Version : $GRRHAG_AUTOUPDATER_VERSION"
+echo "$SEND_TIMESTAMP Installer : $INSTALLER"
 echo "$SEND_TIMESTAMP CONFIGURATION :"
 echo "$SEND_TIMESTAMP Allow Update AutoUpdater : $ALLOW_UPDATE_AUTOUPDATER"
 echo "$SEND_TIMESTAMP Allow Update Freqtrade : $ALLOW_UPDATE_FREQTRADE"
@@ -127,6 +146,95 @@ echo "$SEND_TIMESTAMP Latest Version of Strategy on Github : $strategy_version"
 echo "$SEND_TIMESTAMP Latest Version of Strategy on history_log : $strategy_version_log"
 
 echo "$SEND_TIMESTAMP URL for Donwload Latest Version of Strategy : $git_tarball_url"
+
+if [ "$INSTALLER" == "docker-compose" ] ; then
+cd $FREQTRADE_HOME_PATH 
+EXE_FREQTRADE_VERSION(){
+    version_freqtrade=$(docker-compose run --rm freqtrade --version)
+    version_freqtrade=$(sed "s/freqtrade//g" <<< $version_freqtrade)
+    version_freqtrade=$(sed ':a;N;$!ba;s/\r//g' <<< $version_freqtrade)
+    version_freqtrade=$(sed ':a;N;$!ba;s/\n//g' <<< $version_freqtrade)
+
+  }
+EXE_FREQTRADE_PULL(){
+    docker-compose stop  
+    docker-compose pull
+    docker-compose build 
+    docker-compose up -d
+  }
+EXE_FREQTRADE_RESTART(){
+    docker-compose stop  
+    docker-compose build 
+    docker-compose up -d 
+  }
+  
+elif [ "$INSTALLER" == "sudo docker-compose" ] ; then
+cd $FREQTRADE_HOME_PATH 
+EXE_FREQTRADE_VERSION(){      
+    version_freqtrade=$(sudo docker-compose run --rm freqtrade --version)
+    version_freqtrade=$(sed "s/freqtrade//g" <<< $version_freqtrade)
+    version_freqtrade=$(sed ':a;N;$!ba;s/\r//g' <<< $version_freqtrade)
+    version_freqtrade=$(sed ':a;N;$!ba;s/\n//g' <<< $version_freqtrade)
+  }
+EXE_FREQTRADE_PULL(){
+    sudo docker-compose stop  
+    sudo docker-compose pull
+    sudo docker-compose build 
+    sudo docker-compose up -d
+  }
+EXE_FREQTRADE_RESTART(){
+    sudo docker-compose stop  
+    sudo docker-compose build 
+    sudo docker-compose up -d 
+  }
+elif [ "$INSTALLER" == "custom" ] ; then 
+EXE_FREQTRADE_VERSION(){
+    $CUSTOM_CMD_ACTIVATE_VE
+    version_freqtrade=$CUSTOM_CMD_VERSION
+    version_freqtrade=$(sed "s/freqtrade//g" <<< $version_freqtrade)
+    version_freqtrade=$(sed ':a;N;$!ba;s/\r//g' <<< $version_freqtrade)
+    version_freqtrade=$(sed ':a;N;$!ba;s/\n//g' <<< $version_freqtrade)
+    $CUSTOM_CMD_CLOSE_VE
+  }
+  EXE_FREQTRADE_PULL(){
+    $CUSTOM_CMD_ACTIVATE_VE
+    $CUSTOM_CMD_STOP  
+    $CUSTOM_CMD_PULL
+    $CUSTOM_CMD_BUILD 
+    $CUSTOM_CMD_START
+    $CUSTOM_CMD_CLOSE_VE
+  }
+EXE_FREQTRADE_RESTART(){
+    $CUSTOM_CMD_ACTIVATE_VE
+    $CUSTOM_CMD_STOP  
+    $CUSTOM_CMD_BUILD 
+    $CUSTOM_CMD_START 
+    $CUSTOM_CMD_CLOSE_VE
+  }
+else
+  
+cd $FREQTRADE_HOME_PATH 
+EXE_FREQTRADE_VERSION(){
+      
+    version_freqtrade=$(docker-compose run --rm freqtrade --version)
+    version_freqtrade=$(sed "s/freqtrade//g" <<< $version_freqtrade)
+    version_freqtrade=$(sed ':a;N;$!ba;s/\r//g' <<< $version_freqtrade)
+    version_freqtrade=$(sed ':a;N;$!ba;s/\n//g' <<< $version_freqtrade)
+  }
+EXE_FREQTRADE_PULL(){
+    docker-compose stop  
+    docker-compose pull
+    docker-compose build 
+    docker-compose up -d
+  }
+EXE_FREQTRADE_RESTART(){
+    docker-compose stop  
+    docker-compose build 
+    docker-compose up -d 
+  }
+		    
+fi
+EXE_FREQTRADE_VERSION
 
 if [ "$ALLOW_UPDATE_AUTOUPDATER" == "Y" ] ; then
 if [ ${GRRHAG_AUTOUPDATER_VERSION} != ${latest_version_autoupdater} ]; then
@@ -378,12 +486,10 @@ echo "$SEND_TIMESTAMP Create New Folder for Download Latest Strategy $strategy_v
         https://api.telegram.org/bot${telegram_token}/sendMessage
     
     echo "$SEND_TIMESTAMP FREQTARDE : STOP"  
-    # Restart bot
-    cd $FREQTRADE_HOME_PATH/
-    docker-compose stop
-    #docker-compose build
+
+    EXE_FREQTRADE_RESTART
+
     echo "$SEND_TIMESTAMP FREQTARDE : START"  
-    docker-compose up -d
 
     # Send message to telegram
     curl \
@@ -429,6 +535,31 @@ echo "$SEND_TIMESTAMP Latest Strategy $strategy_version already install"
           https://api.telegram.org/bot${telegram_token}/sendMessage 
           echo "$SEND_TIMESTAMP Daily Message : No Update Today"     
       fi
+      if [ "$nb_error_log" != "0" ]; then
+            
+        SEND_nb=$nb_error_log        
+      
+        # Send message to telegram
+        curl \
+            -s \
+            -X POST \
+            --data "chat_id=$telegram_chat_id" \
+            --data "text=<b>$TIMESTAMP_YMD  $TIMESTAMP_HM :</b><pre> $SEND_nb Error Today</pre>" \
+            --data "parse_mode=HTML" \
+            https://api.telegram.org/bot${telegram_token}/sendMessage
+        echo "$SEND_TIMESTAMP Daily Message : $SEND_nb Error Today"
+      else  
+    
+        # If folder exist send Telegram message
+        curl \
+          -s \
+          -X POST \
+          --data "chat_id=$telegram_chat_id" \
+          --data "text=<b>$TIMESTAMP_YMD  $TIMESTAMP_HM :</b><pre>  No Error Today</pre>" \
+          --data "parse_mode=HTML" \
+          https://api.telegram.org/bot${telegram_token}/sendMessage 
+          echo "$SEND_TIMESTAMP Daily Message : No Error Today"     
+      fi
     fi
 
   fi
@@ -436,15 +567,9 @@ fi
 
 else
 echo "$SEND_TIMESTAMP ERROR : Strategy Latest Version is empty"  
-    # Send message to telegram
-    curl \
-        -s \
-        -X POST \
-        --data "chat_id=$telegram_chat_id" \
-        --data "text=Error : Strategy Latest Version is empty" \
-        --data "parse_mode=HTML" \
-        https://api.telegram.org/bot${telegram_token}/sendMessage
-        echo "SEND_TIMESTAMP Error : Strategy Latest Version is empty"
+
+    Log_error_ID=$(($Log_error_ID + 1))
+    echo "$SEND_TIMESTAMP ; ID=$Log_error_ID ; ERROR=Strategy Latest Version is empty" >> ${AUTOUPDATER_PATH}/history_autoupdater_error.txt
 fi
 
 if [ "$ALLOW_UPDATE_FREQTRADE" == "Y" ] ; then
@@ -458,11 +583,9 @@ echo "$SEND_TIMESTAMP Update FREQTRADE : allow"
     
   
 		if [ -z "$version_freqtrade_log" ]; then		 #vide
-		cd $FREQTRADE_HOME_PATH 
-		version_freqtrade=$(docker-compose run --rm freqtrade --version)
-		version_freqtrade=$(sed "s/freqtrade//g" <<< $version_freqtrade)
-		version_freqtrade=$(sed ':a;N;$!ba;s/\r//g' <<< $version_freqtrade)
-		version_freqtrade=$(sed ':a;N;$!ba;s/\n//g' <<< $version_freqtrade)
+    
+    EXE_FREQTRADE_VERSION
+    
 		echo "$SEND_TIMESTAMP Update FREQTRADE : Actual Version $version_freqtrade"
 		
 
@@ -489,12 +612,8 @@ echo "$SEND_TIMESTAMP Update FREQTRADE : allow"
 				--data "text=$SEND_TO_TELEGRAM_3" \
 				--data "parse_mode=HTML" \
 				https://api.telegram.org/bot${telegram_token}/sendMessage
-				  
-			cd $FREQTRADE_HOME_PATH/
-			docker-compose stop  
-			docker-compose pull
-      #docker-compose build 
-			docker-compose up -d
+			
+      EXE_FREQTRADE_PULL	  
 			
 				# Send message to telegram
 			curl \
@@ -504,11 +623,8 @@ echo "$SEND_TIMESTAMP Update FREQTRADE : allow"
 				--data "text=$SEND_RELOADED" \
 				--data "parse_mode=HTML" \
 				https://api.telegram.org/bot${telegram_token}/sendMessage
-			cd $FREQTRADE_HOME_PATH      
-			version_freqtrade=$(docker-compose run --rm freqtrade --version)
-			version_freqtrade=$(sed "s/freqtrade//g" <<< $version_freqtrade)
-			version_freqtrade=$(sed ':a;N;$!ba;s/\r//g' <<< $version_freqtrade)
-			version_freqtrade=$(sed ':a;N;$!ba;s/\n//g' <<< $version_freqtrade)
+        
+      EXE_FREQTRADE_VERSION
       
       if [ ${version_freqtrade} = ${latest_version_freqtrade} ] ; then				
           Log_ID=$(($Log_ID + 1))    
@@ -547,15 +663,9 @@ echo "$SEND_TIMESTAMP Update FREQTRADE : allow"
 		fi
 	fi	
 else
-    # Send message to telegram
-    curl \
-        -s \
-        -X POST \
-        --data "chat_id=$telegram_chat_id" \
-        --data "text=Error : Freqtrade Latest Version is empty" \
-        --data "parse_mode=HTML" \
-        https://api.telegram.org/bot${telegram_token}/sendMessage
-        echo "SEND_TIMESTAMP ERROR : Freqtrade Latest Version is empty"  
+        
+          Log_error_ID=$(($Log_error_ID + 1))
+    echo "$SEND_TIMESTAMP ; ID=$Log_error_ID ; ERROR=Freqtrade Latest Version is empty" >> ${AUTOUPDATER_PATH}/history_autoupdater_error.txt
 fi
 
 echo "$SEND_TIMESTAMP AUTOUPDATER : No Update"  
