@@ -10,6 +10,17 @@
 		"ALLOW_UPDATE_PAIRLIST": "Y",
 		"ALLOW_REBOOT": "Y",
 		
+		// INSTALLER : Enter "docker-compose" or "sudo docker-compose" or "custom"
+		"INSTALLER": "docker-compose",
+		
+		//For custom user only , enter your own command
+		"CUSTOM_CMD_ACTIVATE_VE": "", // Command for activate virtual environement 
+		"CUSTOM_CMD_CLOSE_VE": "", // Command for close virtual environement
+		"CUSTOM_CMD_VERSION": "", // Command for show actual install version of Freqtrade 
+		"CUSTOM_CMD_START": "", // Command for Start Freqtrade
+		"CUSTOM_CMD_STOP": "", // Command for Stop Freqtrade
+		"CUSTOM_CMD_PULL": "", // Command for Pull Freqtrade
+		"CUSTOM_CMD_BUILD": "", // Command for Build Freqtrade
 		
 		// REPLACE THIS WITH YOUR OWN INFORMATION 
 		
