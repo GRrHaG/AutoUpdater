@@ -13,14 +13,22 @@
 		// INSTALLER : Enter "docker-compose" or "sudo docker-compose" or "custom"
 		"INSTALLER": "docker-compose",
 		
-		//For custom user only , enter your own command
-		"CUSTOM_CMD_ACTIVATE_VE": "", // Command for activate virtual environement 
-		"CUSTOM_CMD_CLOSE_VE": "", // Command for close virtual environement
-		"CUSTOM_CMD_VERSION": "", // Command for show actual install version of Freqtrade 
-		"CUSTOM_CMD_START": "", // Command for Start Freqtrade
-		"CUSTOM_CMD_STOP": "", // Command for Stop Freqtrade
-		"CUSTOM_CMD_PULL": "", // Command for Pull Freqtrade
-		"CUSTOM_CMD_BUILD": "", // Command for Build Freqtrade
+		// For custom user only , enter your own command : #######################
+		// Command for activate virtual environement
+		"CUSTOM_CMD_ACTIVATE_VE": "",
+		// Command for close virtual environement
+		"CUSTOM_CMD_CLOSE_VE": "",
+		// Command for show actual install version of Freqtrade
+		"CUSTOM_CMD_VERSION": "",
+		// Command for Start Freqtrade
+		"CUSTOM_CMD_START": "",
+		// Command for Stop Freqtrade
+		"CUSTOM_CMD_STOP": "",
+		// Command for Pull Freqtrade
+		"CUSTOM_CMD_PULL": "",
+		// Command for Build Freqtrade
+		"CUSTOM_CMD_BUILD": "",
+		// ##########################################################################
 		
 		// REPLACE THIS WITH YOUR OWN INFORMATION 
 		
