@@ -32,7 +32,7 @@
 
 #!/bin/bash
 
-GRRHAG_AUTOUPDATER_VERSION="1.09"
+GRRHAG_AUTOUPDATER_VERSION="1.10"
 TIMESTAMP_YMD=$(date +"%Y-%m-%d")
 TIMESTAMP_HM=$(date +"%H:%M")
 TIMESTAMP_H=$(date +"%H")
@@ -147,6 +147,17 @@ echo "$SEND_TIMESTAMP Latest Version of Strategy on history_log : $strategy_vers
 
 echo "$SEND_TIMESTAMP URL for Donwload Latest Version of Strategy : $git_tarball_url"
 
+echo "$SEND_TIMESTAMP Installer : $INSTALLER"
+if [ "$INSTALLER" == "custom" ] ; then
+    echo "$SEND_TIMESTAMP CMD Activate Virtual environement : $CUSTOM_CMD_ACTIVATE_VE"
+    echo "$SEND_TIMESTAMP CMD Close Virtual environement : $CUSTOM_CMD_CLOSE_VE"
+    echo "$SEND_TIMESTAMP CMD Start Freqtrade : $CUSTOM_CMD_START"
+    echo "$SEND_TIMESTAMP CMD Stop Freqtrade : $CUSTOM_CMD_STOP"            
+    echo "$SEND_TIMESTAMP CMD Version Freqtrade : $CUSTOM_CMD_VERSION"
+    echo "$SEND_TIMESTAMP CMD Pull Freqtrade : $CUSTOM_CMD_PULL"
+    echo "$SEND_TIMESTAMP CMD Build Freqtrade : $CUSTOM_CMD_BUILD "
+fi
+
 if [ "$INSTALLER" == "docker-compose" ] ; then
 cd $FREQTRADE_HOME_PATH 
 EXE_FREQTRADE_VERSION(){
@@ -190,7 +201,7 @@ EXE_FREQTRADE_RESTART(){
 elif [ "$INSTALLER" == "custom" ] ; then 
 EXE_FREQTRADE_VERSION(){
     $CUSTOM_CMD_ACTIVATE_VE
-    version_freqtrade=$CUSTOM_CMD_VERSION
+    version_freqtrade=$(${CUSTOM_CMD_VERSION})
     version_freqtrade=$(sed "s/freqtrade//g" <<< $version_freqtrade)
     version_freqtrade=$(sed ':a;N;$!ba;s/\r//g' <<< $version_freqtrade)
     version_freqtrade=$(sed ':a;N;$!ba;s/\n//g' <<< $version_freqtrade)
