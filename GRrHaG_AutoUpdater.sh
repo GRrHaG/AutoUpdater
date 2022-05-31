@@ -32,7 +32,7 @@
 
 #!/bin/bash
 
-GRRHAG_AUTOUPDATER_VERSION="1.10"
+GRRHAG_AUTOUPDATER_VERSION="1.11"
 TIMESTAMP_YMD=$(date +"%Y-%m-%d")
 TIMESTAMP_HM=$(date +"%H:%M")
 TIMESTAMP_H=$(date +"%H")
@@ -73,14 +73,10 @@ CUSTOM_CMD_PULL=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o '\"C
 CUSTOM_CMD_BUILD=$(cat ${AUTOUPDATER_PATH}/config_autoupdater.json | grep -o '\"CUSTOM_CMD_BUILD\": \".*' | sed "s/\"CUSTOM_CMD_BUILD\": \"//g"| sed 's/\",//')
 
 url_git_autoupdater=https://api.github.com/repos/GRrHaG/AutoUpdater/releases/latest
-latest_version_autoupdater=$(curl -s ${url_git_autoupdater} | grep -o '"tag_name": ".*"' | sed 's/"tag_name": "//' | sed 's/"//')
-latest_version_freqtrade=$(curl -s ${URL_GIT_FREQTRADE} | grep -o '"tag_name": ".*"' | sed 's/"tag_name": "//' | sed 's/"//')
-strategy_version=$(curl -s ${URL_GIT_STRATEGY} | grep -o '"tag_name": ".*"' | sed 's/"tag_name": "//' | sed 's/"//')
 git_tarball_url=$(curl -s ${URL_GIT_STRATEGY} | grep -o '"tarball_url": ".*"' | sed 's/"tarball_url": "//' | sed 's/"//')
 git_tarball_autoupdater_url=$(curl -s ${url_git_autoupdater} | grep -o '"tarball_url": ".*"' | sed 's/"tarball_url": "//' | sed 's/"//')
 LATEST_STRATEGY_PATH=${DOWNLOAD_STRATEGY_PATH}"/NostalgiaForInfinity-"${strategy_version}
 LATEST_AUTOUPDATER_PATH=${DOWNLOAD_AUTOUPDATER_PATH}"/AutoUpdater-"${latest_version_autoupdater}
-
 
 SEND_START="<b>$TIMESTAMP_YMD $TIMESTAMP_HM :</b><b> New Update Found</b>"
 SEND_N_U_FT="<pre>Freqtrade v"$latest_version_freqtrade"</pre>"
@@ -140,8 +136,7 @@ echo "$SEND_TIMESTAMP Freqtrade Blacklist Path : $FREQTRADE_BLACKLIST_PATH"
 echo "$SEND_TIMESTAMP URL GIT Freqtrade : $URL_GIT_FREQTRADE"
 echo "$SEND_TIMESTAMP URL GIT Strategy : $URL_GIT_STRATEGY"
 
-echo "$SEND_TIMESTAMP Latest Version of Freqtrade on Github : $latest_version_freqtrade"
-echo "$SEND_TIMESTAMP Latest Version of Freqtrade on history_log : $version_freqtrade_log"
+
 echo "$SEND_TIMESTAMP Latest Version of Strategy on Github : $strategy_version"
 echo "$SEND_TIMESTAMP Latest Version of Strategy on history_log : $strategy_version_log"
 
@@ -157,6 +152,47 @@ if [ "$INSTALLER" == "custom" ] ; then
     echo "$SEND_TIMESTAMP CMD Pull Freqtrade : $CUSTOM_CMD_PULL"
     echo "$SEND_TIMESTAMP CMD Build Freqtrade : $CUSTOM_CMD_BUILD "
 fi
+
+while_quit_strategy_version=0
+while_quit_latest_version_freqtrade=0
+while_quit_latest_version_autoupdater=0
+
+echo "$SEND_TIMESTAMP ---- GITHUB API ---- "
+while [ "$while_quit_strategy_version" != 5 ]
+do
+  strategy_version=$(curl -s ${URL_GIT_STRATEGY} | grep -o '"tag_name": ".*"' | sed 's/"tag_name": "//' | sed 's/"//')
+  while_quit_strategy_version=$(($while_quit_strategy_version + 1)) 
+  sleep 1
+  echo "$SEND_TIMESTAMP      GITHUB API Strategy Version : try $while_quit_strategy_version"
+  if [[ -n "$strategy_version" ]] ; then
+    while_quit_strategy_version=5
+    echo "$SEND_TIMESTAMP      GITHUB API Strategy Version : $strategy_version"
+  fi
+done
+
+while [ "$while_quit_latest_version_freqtrade" != 5 ]
+do
+latest_version_freqtrade=$(curl -s ${URL_GIT_FREQTRADE} | grep -o '"tag_name": ".*"' | sed 's/"tag_name": "//' | sed 's/"//')
+while_quit_latest_version_freqtrade=$(($while_quit_latest_version_freqtrade + 1)) 
+sleep 1
+echo "$SEND_TIMESTAMP      GITHUB API Freqtrade Version : try $while_quit_latest_version_freqtrade"
+  if [[ -n "$latest_version_freqtrade" ]] ; then
+    while_quit_latest_version_freqtrade=5
+    echo "$SEND_TIMESTAMP      GITHUB API Freqtrade Version : $latest_version_freqtrade"
+  fi
+done
+
+while [ "$while_quit_latest_version_autoupdater" != 5 ] 
+do
+latest_version_autoupdater=$(curl -s ${url_git_autoupdater} | grep -o '"tag_name": ".*"' | sed 's/"tag_name": "//' | sed 's/"//')
+while_quit_latest_version_autoupdater=$(($while_quit_latest_version_autoupdater + 1)) 
+sleep 1
+echo "$SEND_TIMESTAMP      GITHUB API Autoupdater Version : try $while_quit_latest_version_autoupdater"
+  if [[ -n "$latest_version_autoupdater" ]] ; then
+    while_quit_latest_version_autoupdater=5
+        echo "$SEND_TIMESTAMP      GITHUB API Autoupdater Version : $latest_version_autoupdater"
+  fi
+done
 
 if [ "$INSTALLER" == "docker-compose" ] ; then
 cd $FREQTRADE_HOME_PATH 
@@ -245,22 +281,24 @@ EXE_FREQTRADE_RESTART(){
   }
 		    
 fi
-EXE_FREQTRADE_VERSION
 
 if [ "$ALLOW_UPDATE_AUTOUPDATER" == "Y" ] ; then
+echo "$SEND_TIMESTAMP ---- UPDATE AUTOUPDATER ----"
+echo "$SEND_TIMESTAMP      UPDATE AUTOUPDATER : Latest Version of AutoUpdater on Github : $latest_version_autoupdater"
+echo "$SEND_TIMESTAMP      UPDATE AUTOUPDATER : Actual Version of AutoUpdater : $GRRHAG_AUTOUPDATER_VERSION"
 if [ ${GRRHAG_AUTOUPDATER_VERSION} != ${latest_version_autoupdater} ]; then
 
-echo "$SEND_TIMESTAMP Create New Folder for Download Latest AutoUpdater $latest_version_autoupdater"
+echo "$SEND_TIMESTAMP UPDATE AUTOUPDATER : Create New Folder for Download Latest AutoUpdater $latest_version_autoupdater"
 
   mkdir -p ${LATEST_AUTOUPDATER_PATH}
   curl -s -L $git_tarball_autoupdater_url | tar xz -C ${LATEST_AUTOUPDATER_PATH} --strip-components 1
  
   SEND_A_V='%0A'"<b>AutoUpdater v$latest_version_autoupdater</b>"
   
-  echo "$SEND_TIMESTAMP Download Latest AutoUpdater $latest_version_autoupdater"
+  echo "$SEND_TIMESTAMP UPDATE AUTOUPDATER : Download Latest AutoUpdater $latest_version_autoupdater"
     cp ${LATEST_AUTOUPDATER_PATH}/GRrHaG_AutoUpdater.sh ${AUTOUPDATER_PATH}/GRrHaG_AutoUpdater.sh
     SEND_A_U="<b>   AutoUpdater : </b><pre>Updated</pre>"
-    echo "$SEND_TIMESTAMP AutoUpdater : Updated"
+    echo "$SEND_TIMESTAMP UPDATE AUTOUPDATER : Updated"
     
     Log_ID=$(($Log_ID + 1))    
     echo "$SEND_TIMESTAMP ; ID=$Log_ID ; AutoUpdater_Update=$latest_version_autoupdater" >> ${AUTOUPDATER_PATH}/history_autoupdater.txt
@@ -275,6 +313,8 @@ echo "$SEND_TIMESTAMP Create New Folder for Download Latest AutoUpdater $latest_
       --data "text=$SEND_TO_TELEGRAM_AUTOUPDATER" \
       --data "parse_mode=HTML" \
       https://api.telegram.org/bot${telegram_token}/sendMessage
+      else
+      echo "$SEND_TIMESTAMP      UPDATE AUTOUPDATER : Latest version of AutoUpdater $latest_version_autoupdater already install" 
 fi
 fi
 
@@ -286,31 +326,34 @@ fi
 
 
 if [ -n "$strategy_version" ] ; then	 #-n : retourne vrai si la taille de la chaîne n’est pas zéro
-
+echo "$SEND_TIMESTAMP ---- UPDATE STRATEGY ----"
 # If folder don't exist , create it , update NostalgiaForInfinityX.py, blacklist, pairlist and send Telegram message 
 
 
 if [ ${strategy_version_log} != ${strategy_version} ]; then
 
-echo "$SEND_TIMESTAMP Create New Folder for Download Latest Strategy $strategy_version"
+  
+  if [ "$ALLOW_UPDATE_STRATEGY" == "Y" ] ; then
+  
+  echo "$SEND_TIMESTAMP      UPDATE STRATEGY : Create New Folder for Download Latest Strategy $strategy_version"
 
   mkdir -p ${LATEST_STRATEGY_PATH}
   curl -s -L $git_tarball_url | tar xz -C ${LATEST_STRATEGY_PATH} --strip-components 1
  
   SEND_T_V='%0A'"<b>NostalgiaForInfinity $strategy_version</b>"
   
-  if [ "$ALLOW_UPDATE_STRATEGY" == "Y" ] ; then
-  echo "$SEND_TIMESTAMP Download Latest Strategy $strategy_version"
+  echo "$SEND_TIMESTAMP      UPDATE STRATEGY : Download Latest Strategy $strategy_version"
+  
     cp ${LATEST_STRATEGY_PATH}/${BOT_STRATEGY_NAME} ${FREQTRADE_STRATEGY_PATH}/${BOT_STRATEGY_NAME}
     SEND_T_S_Y="<b>   Strategy : </b><pre>Updated</pre>"
-    echo "$SEND_TIMESTAMP Strategy : Updated"
+    echo "$SEND_TIMESTAMP      UPDATE STRATEGY : Updated"
     
     Log_ID=$(($Log_ID + 1))    
     echo "$SEND_TIMESTAMP ; ID=$Log_ID ; Strategy_Update=$strategy_version" >> ${AUTOUPDATER_PATH}/history_autoupdater.txt
     
   else
     SEND_T_S_N="<b>   Strategy : </b><pre>Update Disabled</pre>"
-    echo "$SEND_TIMESTAMP Strategy : Update Disabled"
+    echo "$SEND_TIMESTAMP      UPDATE STRATEGY : Strategy Update Disabled"
   fi
   
   SEND_T_S=$SEND_T_S_Y$SEND_T_S_N
@@ -318,11 +361,11 @@ echo "$SEND_TIMESTAMP Create New Folder for Download Latest Strategy $strategy_v
   if [ "$ALLOW_UPDATE_PAIRLIST" == "Y" ] ; then
     cp ${LATEST_STRATEGY_PATH}/configs/${BOT_PAIRLIST_NAME} ${FREQTRADE_PAIRLIST_PATH}/${BOT_PAIRLIST_NAME}
     SEND_T_P_Y="<b>   Pairlist : </b><pre>Updated</pre>"
-    echo "$SEND_TIMESTAMP Pairlist : Updated"
+    echo "$SEND_TIMESTAMP      UPDATE STRATEGY : Pairlist Updated"
 
   else
     SEND_T_P_N="<b>   Pairlist : </b><pre>Update Disabled</pre>"
-    echo "$SEND_TIMESTAMP Pairlist : Update Disabled"
+    echo "$SEND_TIMESTAMP      UPDATE STRATEGY : Pairlist Update Disabled"
   fi
   
   SEND_T_P=$SEND_T_P_Y$SEND_T_P_N
@@ -331,7 +374,7 @@ echo "$SEND_TIMESTAMP Create New Folder for Download Latest Strategy $strategy_v
 
       if [ "$ALLOW_BLACKLIST_DETAIL" == "Y" ] ; then
       
-      echo "$SEND_TIMESTAMP Blacklist Detail: Allow"
+      echo "$SEND_TIMESTAMP      UPDATE STRATEGY : Blacklist Detail Allow"
       cp ${LATEST_STRATEGY_PATH}/configs/${BOT_BLACKLIST_NAME} ${AUTOUPDATER_PATH}/temp/blacklist/latest_${BOT_BLACKLIST_NAME}
       cp ${FREQTRADE_BLACKLIST_PATH}/${BOT_BLACKLIST_NAME} ${AUTOUPDATER_PATH}/temp/blacklist/actual_${BOT_BLACKLIST_NAME}
       cd ${AUTOUPDATER_PATH}/temp/blacklist
@@ -457,11 +500,11 @@ echo "$SEND_TIMESTAMP Create New Folder for Download Latest Strategy $strategy_v
   
   cp ${LATEST_STRATEGY_PATH}/configs/${BOT_BLACKLIST_NAME} ${FREQTRADE_BLACKLIST_PATH}/${BOT_BLACKLIST_NAME}
   SEND_T_B_Y="<b>   Blacklist : </b><pre>Updated</pre>"
-  echo "$SEND_TIMESTAMP Blacklist : Updated"
+  echo "$SEND_TIMESTAMP      UPDATE STRATEGY : Blacklist Updated"
   
   else
     SEND_T_B_N="<b>   Blacklist : </b><pre>Update Disabled</pre>."
-    echo "$SEND_TIMESTAMP Blacklist : Update Disabled"
+    echo "$SEND_TIMESTAMP      UPDATE STRATEGY : Blacklist Update Disabled"
   fi
 
   SEND_T_B=$SEND_T_B_Y$SEND_T_B_N
@@ -496,11 +539,11 @@ echo "$SEND_TIMESTAMP Create New Folder for Download Latest Strategy $strategy_v
         --data "parse_mode=HTML" \
         https://api.telegram.org/bot${telegram_token}/sendMessage
     
-    echo "$SEND_TIMESTAMP FREQTARDE : STOP"  
+    echo "$SEND_TIMESTAMP      UPDATE STRATEGY : FREQTARDE STOP"  
 
     EXE_FREQTRADE_RESTART
 
-    echo "$SEND_TIMESTAMP FREQTARDE : START"  
+    echo "$SEND_TIMESTAMP      UPDATE STRATEGY : FREQTARDE START"  
 
     # Send message to telegram
     curl \
@@ -512,10 +555,10 @@ echo "$SEND_TIMESTAMP Create New Folder for Download Latest Strategy $strategy_v
         https://api.telegram.org/bot${telegram_token}/sendMessage
   fi
 
-    echo "$SEND_TIMESTAMP FREQTARDE : Reload has been completed!" 
+    echo "$SEND_TIMESTAMP      UPDATE STRATEGY : FREQTARDE Reload has been completed!" 
 else
 
-echo "$SEND_TIMESTAMP Latest Strategy $strategy_version already install"
+echo "$SEND_TIMESTAMP      UPDATE STRATEGY : Latest Strategy $strategy_version already install"
 
   if [ "$TIMESTAMP_H" == "23" ]; then
 
@@ -584,20 +627,18 @@ echo "$SEND_TIMESTAMP ERROR : Strategy Latest Version is empty"
 fi
 
 if [ "$ALLOW_UPDATE_FREQTRADE" == "Y" ] ; then
-echo "$SEND_TIMESTAMP Update FREQTRADE : allow"
-
+echo "$SEND_TIMESTAMP ---- UPDATE FREQTRADE ----"
+echo "$SEND_TIMESTAMP      UPDATE FREQTRADE : Latest Version of Freqtrade on Github : $latest_version_freqtrade"
+echo "$SEND_TIMESTAMP      UPDATE FREQTRADE : Latest Version of Freqtrade on history_log : $version_freqtrade_log"
 	
 	if [ ! -z "$latest_version_freqtrade" ] ; then	 #pas vide
 	SEND_TO_TELEGRAM_3=$SEND_START'%0A'$SEND_N_U_FT'%0A'$SEND_INSTALL_RELOAD
 	
-       
-    
-  
 		if [ -z "$version_freqtrade_log" ]; then		 #vide
     
     EXE_FREQTRADE_VERSION
     
-		echo "$SEND_TIMESTAMP Update FREQTRADE : Actual Version $version_freqtrade"
+		echo "$SEND_TIMESTAMP      UPDATE FREQTRADE : Actual Version $version_freqtrade"
 		
 
     
@@ -609,12 +650,11 @@ echo "$SEND_TIMESTAMP Update FREQTRADE : allow"
 			
 		else
 		
-		echo "$SEND_TIMESTAMP Update FREQTRADE : Actual Version in log file $version_freqtrade_log"
-		
-
+		echo "$SEND_TIMESTAMP      UPDATE FREQTRADE :  Actual Version in log file $version_freqtrade_log"
 		
 			if [ ${version_freqtrade_log} != ${latest_version_freqtrade} ] ; then			
-			echo "$SEND_TIMESTAMP Update FREQTRADE : START Update"
+      
+			echo "$SEND_TIMESTAMP      UPDATE FREQTRADE : START Update"
 			# Send message to telegram
 			curl \
 				-s \
@@ -640,9 +680,11 @@ echo "$SEND_TIMESTAMP Update FREQTRADE : allow"
       if [ ${version_freqtrade} = ${latest_version_freqtrade} ] ; then				
           Log_ID=$(($Log_ID + 1))    
     echo "$SEND_TIMESTAMP ; ID=$Log_ID ; Freqtrade_Update=$version_freqtrade" >> ${AUTOUPDATER_PATH}/history_autoupdater.txt
+    echo "$SEND_TIMESTAMP SUCCESSFUL installation of the latest version of Freqtrade : $version_freqtrade_log"
     else
           Log_ID=$(($Log_ID + 1))
     echo "$SEND_TIMESTAMP ; ID=$Log_ID ; ERROR=Fail to Update Freqtrade v$version_freqtrade to v$latest_version_freqtrade" >> ${AUTOUPDATER_PATH}/history_autoupdater.txt
+    echo "$SEND_TIMESTAMP FAILED to install latest version of Freqtrade : $version_freqtrade_log"
     fi
       
 			cd $AUTOUPDATER_PATH
@@ -670,7 +712,10 @@ echo "$SEND_TIMESTAMP Update FREQTRADE : allow"
 				 echo "$SEND_TIMESTAMP FREQTARDE : Update Success"
 				        
 				fi
-			fi
+			
+      else
+      echo "$SEND_TIMESTAMP      UPDATE FREQTRADE : Latest version of freqtrade $latest_version_freqtrade already install"
+      fi
 		fi
 	fi	
 else
@@ -678,7 +723,5 @@ else
           Log_error_ID=$(($Log_error_ID + 1))
     echo "$SEND_TIMESTAMP ; ID=$Log_error_ID ; ERROR=Freqtrade Latest Version is empty" >> ${AUTOUPDATER_PATH}/history_autoupdater_error.txt
 fi
-
-echo "$SEND_TIMESTAMP AUTOUPDATER : No Update"  
- 
+  
 exit
